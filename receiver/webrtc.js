@@ -209,8 +209,8 @@ var flint = window.flint || {};
       this.log("Applying offer");
 
       function _createPeerConnection(senderId) {
-        //var config = {"iceServers":[]};
-        var config = {"iceServers":[{"url":"stun:stun.services.mozilla.com"}]};
+        var config = {"iceServers":[]};
+        //var config = {"iceServers":[{"url":"stun:stun.services.mozilla.com"}]};
 
         var pc = new window.RTCPeerConnection(config, {});
 

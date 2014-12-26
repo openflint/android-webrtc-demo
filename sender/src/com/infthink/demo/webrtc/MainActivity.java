@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements
 
     private static final String TAG = "flint_webrtc";
 
-    private static final String APP_URL = "http://castapp.infthink.com/mirror/webrtc/index.html";
+    private static final String APP_URL = "http://openflint.github.io/android-webrtc-demo/receiver/index.html";
 
     private PeerConnectionClient mPeerConn;
 
