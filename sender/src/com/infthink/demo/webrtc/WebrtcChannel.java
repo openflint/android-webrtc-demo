@@ -61,6 +61,7 @@ public abstract class WebrtcChannel implements Flint.MessageReceivedCallback {
      */
     public void sendOfferSdp(FlintManager apiClient,
             final SessionDescription sdp) {
+        Log.e("flint_webrtc", "Offer[" + sdp.description + "]");
         JSONObject json = new JSONObject();
         jsonPut(json, "type", "offer");
         jsonPut(json, "sdp", sdp.description);
@@ -80,6 +81,8 @@ public abstract class WebrtcChannel implements Flint.MessageReceivedCallback {
      */
     public void sendLocalIceCandidate(FlintManager apiClient,
             final IceCandidate candidate) {
+        Log.e("flint_webrtc", "sendLocalIceCandidate:sdpMLineIndex[" + candidate.sdpMLineIndex+ "]sdpMid[" + candidate.sdpMid + "]candidate[" +candidate.sdp +"]");
+
         JSONObject json = new JSONObject();
         jsonPut(json, "type", "candidate");
         jsonPut(json, "sdpMLineIndex", candidate.sdpMLineIndex);

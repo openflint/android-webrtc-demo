@@ -32,6 +32,7 @@ import android.util.Log;
 
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
+import org.webrtc.Logging;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
@@ -49,12 +50,13 @@ import org.webrtc.VideoTrack;
 
 import com.infthink.demo.webrtc.WebRtcHelper.SignalingParameters;
 
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PeerConnectionClient {
-    private static final String TAG = "PCRTCClient";
+    private static final String TAG = "flint_webrtc";
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     public static final String AUDIO_TRACK_ID = "ARDAMSa0";
 
@@ -95,7 +97,7 @@ public class PeerConnectionClient {
 
         sdpMediaConstraints = new MediaConstraints();
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-                "OfferToReceiveAudio", "true"));
+                "OfferToReceiveAudio", "false"));
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
                 "OfferToReceiveVideo", "true"));
         videoConstraints = signalingParameters.videoConstraints;
@@ -108,14 +110,14 @@ public class PeerConnectionClient {
          */
         pc = factory.createPeerConnection(signalingParameters.iceServers,
                 pcConstraints, pcObserver);
-        isInitiator = true;
+        //isInitiator = true;
 
         // Uncomment to get ALL WebRTC tracing and SENSITIVE libjingle logging.
         // NOTE: this _must_ happen while |factory| is alive!
-        // Logging.enableTracing(
-        // "logcat:",
-        // EnumSet.of(Logging.TraceLevel.TRACE_ALL),
-        // Logging.Severity.LS_SENSITIVE);
+//        Logging.enableTracing(
+//        "logcat:",
+//        EnumSet.of(Logging.TraceLevel.TRACE_ALL),
+//        Logging.Severity.LS_SENSITIVE);
 
         mediaStream = factory.createLocalMediaStream("ARDAMS");
         if (videoConstraints != null) {
@@ -192,8 +194,10 @@ public class PeerConnectionClient {
             public void run() {
                 if (pc != null) {
                     if (queuedRemoteCandidates != null) {
+                        Log.e(TAG, "add candidate to queue!");
                         queuedRemoteCandidates.add(candidate);
                     } else {
+                        Log.e(TAG, "addIceCandidate:" + candidate);
                         pc.addIceCandidate(candidate);
                     }
                 }
@@ -210,7 +214,7 @@ public class PeerConnectionClient {
                         sdpDescription = setStartBitrate(sdpDescription,
                                 startBitrate);
                     }
-                    Log.d(TAG, "Set remote SDP.");
+                    Log.e(TAG, "Set remote SDP.[" + sdpDescription+ "]");
                     SessionDescription sdpRemote = new SessionDescription(
                             sdp.type, sdpDescription);
                     pc.setRemoteDescription(sdpObserver, sdpRemote);
@@ -401,7 +405,7 @@ public class PeerConnectionClient {
             }
         }
         if (mLineIndex == -1) {
-            Log.d(TAG, "No m=audio line, so can't prefer iSAC");
+            Log.e(TAG, "No m=audio line, so can't prefer iSAC");
             return sdpDescription;
         }
         if (isac16kRtpMap == null) {
@@ -432,7 +436,7 @@ public class PeerConnectionClient {
 
     private void drainCandidates() {
         if (queuedRemoteCandidates != null) {
-            Log.d(TAG, "Add " + queuedRemoteCandidates.size()
+            Log.e(TAG, "Add " + queuedRemoteCandidates.size()
                     + " remote candidates");
             for (IceCandidate candidate : queuedRemoteCandidates) {
                 pc.addIceCandidate(candidate);
@@ -587,7 +591,7 @@ public class PeerConnectionClient {
             activity.runOnUiThread(new Runnable() {
                 public void run() {
                     if (pc != null) {
-                        Log.d(TAG, "Set local SDP from " + sdp.type);
+                        Log.e(TAG, "Set local SDP from " + sdp.type);
                         pc.setLocalDescription(sdpObserver, sdp);
                     }
                 }
@@ -599,6 +603,7 @@ public class PeerConnectionClient {
             activity.runOnUiThread(new Runnable() {
                 public void run() {
                     if (pc == null) {
+                        Log.e(TAG, "onSetSuccess: failed for pc is null!");
                         return;
                     }
                     if (isInitiator) {
@@ -608,13 +613,13 @@ public class PeerConnectionClient {
                         // SDP.
                         if (pc.getRemoteDescription() == null) {
                             // We've just set our local SDP so time to send it.
-                            Log.d(TAG, "Local SDP set succesfully");
+                            Log.e(TAG, "Local SDP set succesfully");
                             events.onLocalDescription(localSdp);
                         } else {
                             // We've just set remote description, so drain
                             // remote
                             // and send local ICE candidates.
-                            Log.d(TAG, "Remote SDP set succesfully");
+                            Log.e(TAG, "Remote SDP set succesfully");
                             drainCandidates();
                         }
                     } else {
@@ -625,13 +630,13 @@ public class PeerConnectionClient {
                             // We've just set our local SDP so time to send it,
                             // drain
                             // remote and send local ICE candidates.
-                            Log.d(TAG, "Local SDP set succesfully");
+                            Log.e(TAG, "Local SDP set succesfully");
                             events.onLocalDescription(localSdp);
                             drainCandidates();
                         } else {
                             // We've just set remote SDP - do nothing for now -
                             // answer will be created soon.
-                            Log.d(TAG, "Remote SDP set succesfully");
+                            Log.e(TAG, "Remote SDP set succesfully");
                         }
                     }
                 }

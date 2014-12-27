@@ -67,7 +67,6 @@ public class MainActivity extends FragmentActivity implements
 
     private static final String TAG = "flint_webrtc";
 
-    //private static final String APP_URL = "http://castapp.infthink.com/mirror/webrtc/index.html";
     private static final String APP_URL = "http://openflint.github.io/android-webrtc-demo/receiver/index.html";
 
     private PeerConnectionClient mPeerConn;
@@ -418,6 +417,7 @@ public class MainActivity extends FragmentActivity implements
                             (String) json.get("sdpMid"),
                             json.getInt("sdpMLineIndex"),
                             (String) json.get("candidate"));
+                    Log.e(TAG, "onMessageReceived:type[" + type + "]sdpMid[" + (String) json.get("sdpMid") + "]sdpMLineIndex[" + json.getInt("sdpMLineIndex") + "]candidate[" + (String) json.get("candidate") + "]");
                     onRemoteIceCandidate(candidate);
                 } else if (type.equals("answer") || type.equals("offer")) {
                     SessionDescription sdp = new SessionDescription(
@@ -623,7 +623,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void logAndToast(String msg) {
-        Log.d(TAG, msg);
+        Log.e(TAG, msg);
         if (mLogToast != null) {
             mLogToast.cancel();
         }
@@ -662,6 +662,7 @@ public class MainActivity extends FragmentActivity implements
         logAndToast("onRemoteDescription... " + sdp);
 
         if (mPeerConn == null) {
+            Log.e(TAG, "onRemoteDescription: peer is null? ignore!");
             return;
         }
         logAndToast("Received remote " + sdp.type + " ...");

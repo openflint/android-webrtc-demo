@@ -88,7 +88,7 @@ public class WebRtcHelper {
                 "DtlsSrtpKeyAgreement", "true"));
 
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-                "OfferToReceiveAudio", "true"));
+                "OfferToReceiveAudio", "false"));
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
                 "OfferToReceiveVideo", "true"));
 
@@ -98,6 +98,7 @@ public class WebRtcHelper {
 
         MediaConstraints audioConstraints = constraintsFromJSON(getAVVConstraints(
                 "audio", "{}"));
+        audioConstraints = null;
         Log.d(TAG, "audioConstraints: " + audioConstraints);
 
         return new SignalingParameters(iceServers, initiator, pcConstraints,
@@ -108,7 +109,7 @@ public class WebRtcHelper {
     // |mediaConstraintsString|.
     private String getAVConstraints(String type, String mediaConstraintsString)
             throws JSONException {
-        return "{\"mandatory\": { maxWidth: 1280, maxHeight: 720, minWidth: 640, minHeight: 480}, \"optional\": [{\"VoiceActivityDetection\": false}]}";
+        return "{\"mandatory\": { maxWidth: 1280, maxHeight: 720, minWidth: 640, minHeight: 480}, \"optional\": []}";
         // return
         // "{\"optional\": [{\"minWidth\": \"1280\", \"minHeight\": \"720\"}], \"mandatory\": {}}";
     }
@@ -155,11 +156,17 @@ public class WebRtcHelper {
     private LinkedList<PeerConnection.IceServer> iceServersFromPCConfigJSON(
             String pcConfig) throws JSONException {
         LinkedList<PeerConnection.IceServer> ret = new LinkedList<PeerConnection.IceServer>();
-        ret.add(new
-        PeerConnection.IceServer("stun:stun.services.mozilla.com"));
+//        ret.add(new
+//        PeerConnection.IceServer("stun:stun.services.mozilla.com"));
 
-        ret.add(new
-                PeerConnection.IceServer("stun:stun.l.google.com:19302"));
+//        ret.add(new
+//                PeerConnection.IceServer("stun:stun.l.google.com:19302"));
+//
+//        ret.add(new
+//                PeerConnection.IceServer("turn:turn.bistri.com:80", "homeo", "homeo"));
+//
+//        ret.add(new
+//                PeerConnection.IceServer("turn:turn.anyfirewall.com:443?transport=tcp", "webrtc", "webrtc"));
         return ret;
     }
 
