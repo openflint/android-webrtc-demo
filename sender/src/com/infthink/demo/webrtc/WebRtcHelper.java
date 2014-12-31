@@ -156,17 +156,17 @@ public class WebRtcHelper {
     private LinkedList<PeerConnection.IceServer> iceServersFromPCConfigJSON(
             String pcConfig) throws JSONException {
         LinkedList<PeerConnection.IceServer> ret = new LinkedList<PeerConnection.IceServer>();
-//        ret.add(new
-//        PeerConnection.IceServer("stun:stun.services.mozilla.com"));
+        ret.add(new
+        PeerConnection.IceServer("stun:stun.services.mozilla.com"));
 
-//        ret.add(new
-//                PeerConnection.IceServer("stun:stun.l.google.com:19302"));
+        ret.add(new
+                PeerConnection.IceServer("stun:stun.l.google.com:19302"));
 //
-//        ret.add(new
-//                PeerConnection.IceServer("turn:turn.bistri.com:80", "homeo", "homeo"));
+        ret.add(new
+                PeerConnection.IceServer("turn:turn.bistri.com:80", "homeo", "homeo"));
 //
-//        ret.add(new
-//                PeerConnection.IceServer("turn:turn.anyfirewall.com:443?transport=tcp", "webrtc", "webrtc"));
+        ret.add(new
+                PeerConnection.IceServer("turn:turn.anyfirewall.com:443?transport=tcp", "webrtc", "webrtc"));
         return ret;
     }
 
