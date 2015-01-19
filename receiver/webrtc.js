@@ -24,8 +24,12 @@ var flint = window.flint || {};
       ("onMessage" in self) && self.onMessage(senderId, data);
     });
 
-    window.messageBus.onsenderConnected = self.onSenderConnected.bind(this);
-    window.messageBus.onsenderDisconnected = self.onSenderDisconnected.bind(this);
+    window.messageBus.on('senderConnected', function (senderId) {
+        self.onSenderConnected(senderId);
+    });
+    window.messageBus.on('senderDisconnected', function(senderId) {
+        self.onSenderDisconnected(senderId);
+    });
 
     // webkitRTCPeerConnection is Chrome specific
     window.RTCPeerConnection = window.RTCPeerConnection|| window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
