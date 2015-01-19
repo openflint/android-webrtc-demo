@@ -16,7 +16,7 @@ var flint = window.flint || {};
     self.videos = {};
     self.streams = {};
   
-    window.flintReceiverManager = new ReceiverManagerWrapper(WEBRTC_APPNAME);
+    window.flintReceiverManager = new FlintReceiverManager(WEBRTC_APPNAME);
     window.messageBus = window.flintReceiverManager.createMessageBus(WEBRTC_NAMESPACE);
     window.messageBus.on("message", function(senderId, message) {
       console.log("onMessage called with: " + message);
