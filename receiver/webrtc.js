@@ -15,20 +15,25 @@ var flint = window.flint || {};
     self.peers = {};
     self.videos = {};
     self.streams = {};
+    self._senders = {};
   
     window.flintReceiverManager = new FlintReceiverManager(WEBRTC_APPNAME);
     window.messageBus = window.flintReceiverManager.createMessageBus(WEBRTC_NAMESPACE);
-    window.messageBus.on("message", function(senderId, message) {
+    window.messageBus.on("message", function(message, senderId) {
       console.log("onMessage called with: " + message);
       var data = JSON.parse(message);
       ("onMessage" in self) && self.onMessage(senderId, data);
     });
 
     window.messageBus.on('senderConnected', function (senderId) {
-        self.onSenderConnected(senderId);
+      self._senders[senderId] = senderId;
+      console.log("senderConnected!!!!!");
+      self.onSenderConnected(senderId);
     });
     window.messageBus.on('senderDisconnected', function(senderId) {
-        self.onSenderDisconnected(senderId);
+      delete self._senders[senderId];
+      console.log("senderDisconnected!!!!!");
+      self.onSenderDisconnected(senderId);
     });
 
     // webkitRTCPeerConnection is Chrome specific
@@ -42,6 +47,9 @@ var flint = window.flint || {};
   };
 
   Webrtc.prototype = {
+    getSenderList: function() {
+      return this._senders;
+    },
 
     log: function(msg) {
       console.log("flint.Webrtc: " + msg);
@@ -69,9 +77,9 @@ var flint = window.flint || {};
 
     // called when sender connected
     onSenderConnected: function (senderId) {
-      this.log('onSenderConnected. Total number of senders: ' + Object.keys(window.flintReceiverManager.getSenderList()).length);
+      this.log('onSenderConnected. Total number of senders: ' + Object.keys(self.getSenderList()).length);
       self.showVideo(divs.large_video);
-      if (Object.keys(window.flintReceiverManager.getSenderList()).length == 2) {
+      if (Object.keys(self.getSenderList()).length == 2) {
         self.showVideo(divs.mini_video);
       }
     },
@@ -93,11 +101,11 @@ var flint = window.flint || {};
       // hide mini video
       self.hideVideo(divs.mini_video);
 
-      this.log('onSenderDisconnected. Total number of senders: ' + Object.keys(window.flintReceiverManager.getSenderList()).length);
+      this.log('onSenderDisconnected. Total number of senders: ' + Object.keys(self.getSenderList()).length);
 
       // display large video
-      if (Object.keys(window.flintReceiverManager.getSenderList()).length == 1) {
-          var sender = Object.keys(window.flintReceiverManager.getSenderList())[0];
+      if (Object.keys(self.getSenderList()).length == 1) {
+          var sender = Object.keys(self.getSenderList())[0];
           if (senderId == sender) {
             this.log("disconnected??");
             return;
@@ -113,7 +121,7 @@ var flint = window.flint || {};
       }
 
       // close app?
-      if (Object.keys(window.flintReceiverManager.getSenderList()).length == 0) {
+      if (Object.keys(self.getSenderList()).length == 0) {
         window.close();
       }
     },
@@ -134,8 +142,8 @@ var flint = window.flint || {};
         return;
       }
 
-      if (Object.keys(window.flintReceiverManager.getSenderList()).length > 2) {
-        this.sendMessage(senderId, {'type': 'byte', 'data':'room is full!Current user num[' + Object.keys(window.flintReceiverManager.getSenderList()).length + ']'});
+      if (Object.keys(self.getSenderList()).length > 2) {
+        this.sendMessage(senderId, {'type': 'byte', 'data':'room is full!Current user num[' + Object.keys(self.getSenderList()).length + ']'});
 	return;
       }
       
@@ -166,7 +174,7 @@ var flint = window.flint || {};
     // switch video view. mini<->large
     switchView: function() {
       this.log("switchView!!");
-      var senders = Object.keys(window.flintReceiverManager.getSenderList());
+      var senders = Object.keys(self.getSenderList());
       if (senders.length == 0) {
         return;
       }
@@ -243,7 +251,7 @@ var flint = window.flint || {};
           self.videos[senderId] = 'large';
           self.streams[senderId] = obj.stream;
 
-          var senders = Object.keys(window.flintReceiverManager.getSenderList());
+          var senders = Object.keys(self.getSenderList());
 
           // TEMP fix WA for no stream issue
           //if (senders.length == 1) {
@@ -345,7 +353,7 @@ var flint = window.flint || {};
 		sdpMLineIndex: evt.candidate.sdpMLineIndex,
 		sdpMid: evt.candidate.sdpMid,
 		candidate: evt.candidate.candidate
-		}) , senderId);
+		}), senderId);
         }  
       }
 
